@@ -1,0 +1,9 @@
+/data/
+/mediaserver
+/mediaserver.exe
+/web/node_modules/
+/web/dist/
+*.log
+*.tmp
+*.bak
+*.corrupt-*

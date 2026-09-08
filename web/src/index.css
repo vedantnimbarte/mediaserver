@@ -1,0 +1,237 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    color-scheme: dark;
+
+    /* Netflix red, as RGB triplets so Tailwind's <alpha-value> works. Appearance
+       settings overwrite these at runtime, which recolours the entire app. */
+    --accent: 229 9 20;
+    --accent-soft: 245 60 70;
+    --accent-dim: 178 7 16;
+
+    /* Poster density, driven by the user's Appearance preference. */
+    --poster-min: 10rem;
+  }
+
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+
+  body {
+    @apply bg-ink-900 text-ink-200 antialiased;
+    font-feature-settings: 'cv02', 'cv03', 'cv04';
+    text-rendering: optimizeLegibility;
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    @apply bg-transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    @apply rounded-full bg-ink-700;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-ink-600;
+  }
+
+  :focus-visible {
+    @apply outline-none ring-2 ring-accent ring-offset-2 ring-offset-ink-900;
+  }
+
+  /* Respect the OS setting as well as the in-app one: someone who has asked their
+     system for less motion should not have to ask again here. */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+
+  /* The in-app toggle sets this on <html>. */
+  :root[data-reduced-motion='true'] * {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+@layer components {
+  /* ---- wordmark ---- */
+
+  .wordmark {
+    @apply select-none font-black uppercase tracking-wordmark text-accent;
+    /* The subtle glow is what separates a wordmark from bold red text. */
+    text-shadow: 0 0 24px rgb(var(--accent) / 0.35);
+  }
+
+  /* ---- buttons ---- */
+
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded font-medium
+           transition-all duration-150 disabled:cursor-not-allowed disabled:opacity-40;
+  }
+  .btn-md {
+    @apply btn px-5 py-2.5 text-sm;
+  }
+  .btn-sm {
+    @apply btn px-3 py-1.5 text-xs;
+  }
+
+  /* White on dark is Netflix's primary action, not the red; the red is reserved for
+     brand moments so the primary button does not fight the wordmark. */
+  .btn-primary {
+    @apply btn-md bg-white text-black hover:bg-white/80;
+  }
+  .btn-accent {
+    @apply btn-md bg-accent text-white hover:bg-accent-soft;
+  }
+  .btn-ghost {
+    @apply btn-md bg-ink-700/80 text-white backdrop-blur hover:bg-ink-600;
+  }
+  .btn-outline {
+    @apply btn-md border border-ink-500 bg-transparent text-ink-200 hover:border-ink-300 hover:text-white;
+  }
+  .btn-danger {
+    @apply btn-md bg-netflix-dark text-white hover:bg-netflix-red;
+  }
+
+  /* Round icon button used across the player and card overlays. */
+  .btn-icon {
+    @apply inline-flex items-center justify-center rounded-full border border-ink-500/70
+           bg-ink-900/70 p-2 text-white backdrop-blur transition-all
+           hover:border-white hover:bg-ink-800 disabled:opacity-40;
+  }
+
+  /* ---- form controls ---- */
+
+  .input {
+    @apply w-full rounded border border-ink-600 bg-ink-800 px-3 py-2.5 text-sm text-white
+           placeholder-ink-400 transition-colors
+           focus:border-ink-300 focus:bg-ink-700 focus:outline-none;
+  }
+  .select {
+    @apply input cursor-pointer appearance-none bg-ink-800 pr-9;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23b3b3b3' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.6rem center;
+    background-size: 1rem;
+  }
+  .label {
+    @apply mb-1.5 block text-xs font-semibold uppercase tracking-wider text-ink-400;
+  }
+  .hint {
+    @apply mt-1.5 text-xs leading-relaxed text-ink-400;
+  }
+
+  /* Switch, used throughout Settings for booleans. */
+  .switch {
+    @apply relative inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full
+           border-2 border-transparent transition-colors focus-visible:ring-2
+           focus-visible:ring-accent;
+  }
+  .switch-on {
+    @apply bg-accent;
+  }
+  .switch-off {
+    @apply bg-ink-600;
+  }
+  .switch-knob {
+    @apply pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white
+           shadow transition-transform;
+  }
+
+  /* ---- surfaces ---- */
+
+  .card {
+    @apply rounded-lg border border-ink-700/60 bg-ink-850 p-5;
+  }
+  .panel {
+    @apply rounded-lg border border-ink-700/60 bg-ink-850;
+  }
+
+  .chip {
+    @apply inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs
+           font-medium transition-colors;
+  }
+  .chip-on {
+    @apply chip border-white bg-white text-black;
+  }
+  .chip-off {
+    @apply chip border-ink-600 bg-transparent text-ink-300 hover:border-ink-400 hover:text-white;
+  }
+
+  /* ---- rows and grids ---- */
+
+  /* Horizontal carousel track. The padding leaves room for a hovered card to grow
+     without being clipped by the row's own overflow. */
+  .row-track {
+    @apply flex gap-2 overflow-x-auto scroll-smooth px-4 py-8 lg:px-12;
+    scrollbar-width: none;
+  }
+  .row-track::-webkit-scrollbar {
+    display: none;
+  }
+
+  .poster-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(var(--poster-min), 1fr));
+    gap: 1rem;
+  }
+
+  /* ---- skeletons ---- */
+
+  .skeleton {
+    @apply animate-shimmer rounded bg-ink-700;
+  }
+}
+
+@layer utilities {
+  /* Clamp long overviews without a plugin. */
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .line-clamp-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  /* The gradient scrim under hero text, so titles stay readable on any artwork. */
+  .scrim-bottom {
+    background: linear-gradient(
+      to top,
+      rgb(20 20 20) 0%,
+      rgb(20 20 20 / 0.85) 15%,
+      rgb(20 20 20 / 0.35) 45%,
+      transparent 75%
+    );
+  }
+  .scrim-left {
+    background: linear-gradient(
+      to right,
+      rgb(20 20 20) 0%,
+      rgb(20 20 20 / 0.8) 30%,
+      rgb(20 20 20 / 0.2) 60%,
+      transparent 100%
+    );
+  }
+}
+
+/* The player draws its own controls. */
+video::-webkit-media-controls {
+  display: none !important;
+}
